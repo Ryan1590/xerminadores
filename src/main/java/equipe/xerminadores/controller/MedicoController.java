@@ -1,5 +1,6 @@
 package equipe.xerminadores.controller;
 
+import equipe.xerminadores.exception.DuplicateCrmException;
 import equipe.xerminadores.model.Medico;
 import equipe.xerminadores.service.MedicoService;
 import org.springframework.http.HttpStatus;
@@ -51,11 +52,22 @@ public class MedicoController {
             medicoService.salvar(medico);
             redirectAttributes.addFlashAttribute("mensagem", "Médico salvo com sucesso!");
             redirectAttributes.addFlashAttribute("tipoMensagem", "sucesso");
+            return "redirect:/medicos";
+        } catch (DuplicateCrmException e) {
+            // CRM já existe: volta para o formulário e exibe o erro
+            redirectAttributes.addFlashAttribute("mensagem", e.getMessage());
+            redirectAttributes.addFlashAttribute("tipoMensagem", "erro");
+            // Redireciona para novo ou edição, conforme venha o id
+            if (medico.getId() == null) {
+                return "redirect:/medicos/novo";
+            } else {
+                return "redirect:/medicos/editar/" + medico.getId();
+            }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensagem", "Erro ao salvar médico: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensagem", "erro");
+            return "redirect:/medicos";
         }
-        return "redirect:/medicos";
     }
 
     @GetMapping("/deletar/{id}")

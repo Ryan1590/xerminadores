@@ -1,5 +1,6 @@
 package equipe.xerminadores.service;
 
+import equipe.xerminadores.exception.DuplicateCrmException;
 import equipe.xerminadores.model.Medico;
 import equipe.xerminadores.repository.MedicoRepository;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,20 @@ public class MedicoService {
     }
 
     public Medico salvar(Medico medico) {
-        if (medico.getId() != null) {
-            // Atualiza médico existente
-            return atualizar(medico.getId(), medico);
-        } else {
-            // Insere novo médico
+        // Se for novo registro (id == null)
+        if (medico.getId() == null) {
+            if (medicoRepository.existsByCrm(medico.getCrm())) {
+                throw new DuplicateCrmException("CRM '" + medico.getCrm() + "' já está cadastrado.");
+            }
             return medicoRepository.save(medico);
         }
+        // Se for atualização: permitir mesmo CRM se for o mesmo registro,
+        // mas bloquear se outro registro já usar aquele CRM
+        Optional<Medico> existente = medicoRepository.findByCrm(medico.getCrm());
+        if (existente.isPresent() && !existente.get().getId().equals(medico.getId())) {
+            throw new DuplicateCrmException("CRM '" + medico.getCrm() + "' já está cadastrado.");
+        }
+        return medicoRepository.save(medico);
     }
 
 

@@ -34,23 +34,24 @@
         </tbody>
     </table>
 </div>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
-<div th:if="${mensagem}" th:with="msg='[[${mensagem}]]', tipo='[[${tipoMensagem}]]'">
-    <script>
-        let mensagem = /*[[${msg}]]*/ "";
-        let tipo = /*[[${tipo}]]*/ "";
+<div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let mensagem = /*[[${msg}]]*/ '';
+        let tipo = /*[[${tipo}]]*/ '';
         if (mensagem && tipo) {
-            if (tipo === 'sucesso') {
-                alertaSucesso(mensagem);
-            } else if (tipo === 'erro') {
-                alertaErro(mensagem);
-            }
+          if (tipo === 'sucesso') {
+            alertaSucesso(mensagem);
+          } else {
+            alertaErro(mensagem);
+          }
         }
+        /*]]>*/
     </script>
 </div>
 
-
-
-<div th:replace="~{fragments/footer :: footer}"></div>
+</div>
 </body>
 </html>

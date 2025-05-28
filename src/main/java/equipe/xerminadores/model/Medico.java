@@ -1,10 +1,6 @@
 package equipe.xerminadores.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -17,6 +13,7 @@ public class Medico {
     private Long id;
 
     private String nome;
+    @Column(nullable = false, unique = true)
     private String crm;
     private String especialidade;
 }
