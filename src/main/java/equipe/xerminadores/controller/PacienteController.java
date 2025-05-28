@@ -1,5 +1,6 @@
 package equipe.xerminadores.controller;
 
+import equipe.xerminadores.exception.CpfJaCadastradoException;
 import equipe.xerminadores.model.Paciente;
 import equipe.xerminadores.service.PacienteService;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,11 @@ public class PacienteController {
             pacienteService.salvar(paciente);
             redirect.addFlashAttribute("mensagem", "Paciente salvo com sucesso!");
             redirect.addFlashAttribute("tipoMensagem", "sucesso");
+        } catch (CpfJaCadastradoException e) {
+            redirect.addFlashAttribute("mensagem", e.getMessage());
+            redirect.addFlashAttribute("tipoMensagem", "erro");
+            redirect.addFlashAttribute("paciente", paciente);  // para manter dados do formulário
+            return "redirect:/pacientes/novo"; // ou direcionar para a página de cadastro
         } catch (Exception e) {
             redirect.addFlashAttribute("mensagem", "Erro ao salvar: " + e.getMessage());
             redirect.addFlashAttribute("tipoMensagem", "erro");
