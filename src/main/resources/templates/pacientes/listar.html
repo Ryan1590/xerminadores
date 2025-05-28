@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header(title='Pacientes')}"></head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+    <h2 class="mb-4">Lista de Pacientes</h2>
+    <a class="btn btn-success mb-3" th:href="@{/pacientes/novo}">Cadastrar Paciente</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Data Nascimento</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="paciente : ${pacientes}">
+            <td th:text="${paciente.nome}">Nome</td>
+            <td th:text="${paciente.cpf}">CPF</td>
+            <td th:text="${#temporals.format(paciente.dataNascimento, 'dd/MM/yyyy')}">Data Nascimento</td>
+            <td th:text="${paciente.telefone}">Telefone</td>
+            <td>
+                <a class="btn btn-sm btn-warning" th:href="@{/pacientes/editar/{id}(id=${paciente.id})}">Editar</a>
+                <a href="#" class="btn btn-sm btn-danger"
+                   th:onclick="'confirmarExclusao(() => { window.location.href = \'' + @{/pacientes/deletar/{id}(id=${paciente.id})} + '\' })'">
+                    Excluir
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let mensagem = /*[[${msg}]]*/ '';
+        let tipo = /*[[${tipo}]]*/ '';
+        if (mensagem && tipo) {
+          if (tipo === 'sucesso') {
+            alertaSucesso(mensagem);
+          } else {
+            alertaErro(mensagem);
+          }
+        }
+        /*]]>*/
+    </script>
+</div>
+</body>
+</html>
