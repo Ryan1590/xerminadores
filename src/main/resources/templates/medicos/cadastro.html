@@ -1,0 +1,32 @@
+<!-- templates/medicos/cadastro.html -->
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header(title='Página Inicial')}"></head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+  <h2 th:text="${medico.id} != null ? 'Editar Médico' : 'Cadastrar Médico'" class="mb-4"></h2>
+
+  <form th:action="@{/medicos}" th:object="${medico}" method="post">
+    <input type="hidden" th:field="*{id}"/>
+    <div class="mb-3">
+      <label class="form-label">Nome</label>
+      <input type="text" class="form-control" th:field="*{nome}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">CRM</label>
+      <input type="text" class="form-control" th:field="*{crm}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Especialidade</label>
+      <input type="text" class="form-control" th:field="*{especialidade}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a class="btn btn-secondary" th:href="@{/medicos}">Cancelar</a>
+  </form>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

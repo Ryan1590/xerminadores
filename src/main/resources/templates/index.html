@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header(title='Página Inicial')}"></head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+    <h1 class="text-center">Bem-vindo à Clínica Médica</h1>
+    <p class="text-center">Escolha uma opção abaixo:</p>
+
+    <div class="d-flex justify-content-center gap-3">
+        <a class="btn btn-primary" th:href="@{/medicos}">Médicos</a>
+        <a class="btn btn-primary" th:href="@{/pacientes}">Pacientes</a>
+        <a class="btn btn-primary" th:href="@{/agendamentos}">Agenda</a>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

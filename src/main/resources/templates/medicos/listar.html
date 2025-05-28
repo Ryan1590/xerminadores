@@ -1,0 +1,56 @@
+<!-- templates/medicos/listar.html -->
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header(title='Página Inicial')}"></head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+    <h2 class="mb-4">Lista de Médicos</h2>
+    <a class="btn btn-success mb-3" th:href="@{/medicos/novo}">Cadastrar Médico</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Nome</th>
+            <th>CRM</th>
+            <th>Especialidade</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="medico : ${medicos}">
+            <td th:text="${medico.nome}">Nome</td>
+            <td th:text="${medico.crm}">CRM</td>
+            <td th:text="${medico.especialidade}">Especialidade</td>
+            <td>
+                <a class="btn btn-sm btn-warning" th:href="@{/medicos/editar/{id}(id=${medico.id})}">Editar</a>
+                <a href="#" class="btn btn-sm btn-danger"
+                   th:onclick="'confirmarExclusao(() => { window.location.href = \'' + @{/medicos/deletar/{id}(id=${medico.id})} + '\' })'">
+                    Excluir
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:if="${mensagem}" th:with="msg='[[${mensagem}]]', tipo='[[${tipoMensagem}]]'">
+    <script>
+        let mensagem = /*[[${msg}]]*/ "";
+        let tipo = /*[[${tipo}]]*/ "";
+        if (mensagem && tipo) {
+            if (tipo === 'sucesso') {
+                alertaSucesso(mensagem);
+            } else if (tipo === 'erro') {
+                alertaErro(mensagem);
+            }
+        }
+    </script>
+</div>
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
