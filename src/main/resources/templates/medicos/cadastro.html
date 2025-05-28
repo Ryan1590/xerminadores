@@ -20,8 +20,38 @@
     </div>
     <div class="mb-3">
       <label class="form-label">Especialidade</label>
-      <input type="text" class="form-control" th:field="*{especialidade}" required>
+      <select class="form-select" th:field="*{especialidade}" required>
+        <option value="" disabled th:text="${medico.especialidade} == null ? 'Selecione...' : ''">Selecione...</option>
+        <option value="Cardiologia">Cardiologia</option>
+        <option value="Dermatologia">Dermatologia</option>
+        <option value="Pediatria">Pediatria</option>
+        <option value="Ortopedia">Ortopedia</option>
+        <option value="Ginecologia e Obstetrícia">Ginecologia e obstetrícia</option>
+        <option value="Neurologia">Neurologia</option>
+        <option value="Psiquiatria">Psiquiatria</option>
+        <option value="Oftalmologia">Oftalmologia</option>
+        <option value="Otorrinolaringologia">Otorrinolaringologia</option>
+        <option value="Oncologia">Oncologia</option>
+        <option value="Urologia">Urologia</option>
+        <option value="Endocrinologia">Endocrinologia</option>
+        <option value="Gastroenterologia">Gastroenterologia</option>
+        <option value="Reumatologia">Reumatologia</option>
+        <option value="Nefrologia">Nefrologia</option>
+        <option value="Pneumologia">Pneumologia</option>
+        <option value="Hematologia">Hematologia</option>
+        <option value="Infectologia">Infectologia</option>
+        <option value="Alergia e Imunologia">Alergia e imunologia</option>
+        <option value="Cirurgia Geral">Cirurgia geral</option>
+        <option value="Cirurgia Plástica">Cirurgia plástica</option>
+        <option value="Anestesiologia">Anestesiologia</option>
+        <option value="Radiologia">Radiologia</option>
+        <option value="Medicina de Família e Comunidade">Medicina de família e comunidade</option>
+        <option value="Clínica Médica / Medicina Interna">Clínica médica / medicina interna</option>
+        <option value="Medicina Física e Reabilitação">Medicina física e reabilitação</option>
+        <option value="Outras">Outras</option>
+      </select>
     </div>
+
     <button type="submit" class="btn btn-primary">Salvar</button>
     <a class="btn btn-secondary" th:href="@{/medicos}">Cancelar</a>
   </form>
