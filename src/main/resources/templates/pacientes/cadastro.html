@@ -15,7 +15,7 @@
     </div>
     <div class="mb-3">
       <label class="form-label">CPF</label>
-      <input type="text" class="form-control" th:field="*{cpf}" placeholder="000.000.000-00" required>
+      <input type="text" class="form-control validar-cpf" th:field="*{cpf}" placeholder="000.000.000-00" required>
     </div>
     <div class="mb-3">
       <label class="form-label">Data de Nascimento</label>
@@ -31,11 +31,6 @@
 </div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-<script src="/js/mascaras.js"></script>
 
 <div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
   <script th:inline="javascript">
