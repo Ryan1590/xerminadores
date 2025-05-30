@@ -4,16 +4,13 @@
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Lista de Agendamentos</h2>
-        <a class="btn btn-primary" th:href="@{/agendamentos/novo}">Novo Agendamento</a>
-    </div>
+<div class="container">
+    <h2 class="mb-4">Lista de Agendamentos</h2>
+    <a class="btn btn-success mb-3" th:href="@{/agendamentos/novo}">Novo Agendamento</a>
 
-    <table class="table table-striped">
-        <thead>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
         <tr>
-            <th>ID</th>
             <th>Paciente</th>
             <th>Médico</th>
             <th>Data</th>
@@ -23,16 +20,16 @@
         </thead>
         <tbody>
         <tr th:each="agenda : ${agendas}">
-            <td th:text="${agenda.id}"></td>
-            <td th:text="${agenda.paciente.nome}"></td>
-            <td th:text="${agenda.medico.nome}"></td>
-            <td th:text="${#temporals.format(agenda.data, 'dd/MM/yyyy')}"></td>
-            <td th:text="${agenda.horario}"></td>
+            <td th:text="${agenda.paciente.nome}">Paciente</td>
+            <td th:text="${agenda.medico.nome}">Médico</td>
+            <td th:text="${#temporals.format(agenda.data, 'dd/MM/yyyy')}">Data</td>
+            <td th:text="${agenda.horario}">Horário</td>
             <td>
-                <a th:href="@{/agendamentos/editar/{id}(id=${agenda.id})}" class="btn btn-sm btn-warning">Editar</a>
-                <a th:href="@{/agendamentos/excluir/{id}(id=${agenda.id})}"
-                   class="btn btn-sm btn-danger"
-                   onclick="return confirm('Tem certeza que deseja excluir este agendamento?')">Excluir</a>
+                <a class="btn btn-sm btn-warning" th:href="@{/agendamentos/editar/{id}(id=${agenda.id})}">Editar</a>
+                <a href="#" class="btn btn-sm btn-danger"
+                   th:onclick="'confirmarExclusao(() => { window.location.href = \'' + @{/agendamentos/excluir/{id}(id=${agenda.id})} + '\' })'">
+                    Excluir
+                </a>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(agendas)}">
@@ -46,9 +43,9 @@
 
 <div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
     <script th:inline="javascript">
-        /<![CDATA[/
-        let mensagem = /[[${msg}]]/ '';
-        let tipo = /[[${tipo}]]/ '';
+        /*<![CDATA[*/
+        let mensagem = /*[[${msg}]]*/ '';
+        let tipo = /*[[${tipo}]]*/ '';
         if (mensagem && tipo) {
             if (tipo === 'sucesso') {
                 alertaSucesso(mensagem);
@@ -56,7 +53,7 @@
                 alertaErro(mensagem);
             }
         }
-        /]]>/
+        /*]]>*/
     </script>
 </div>
 

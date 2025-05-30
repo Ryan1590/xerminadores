@@ -19,7 +19,9 @@
     </div>
     <div class="mb-3">
       <label class="form-label">Data de Nascimento</label>
-      <input type="date" class="form-control" th:field="*{dataNascimento}"  required>
+      <input type="date" class="form-control"
+             name="dataNascimento"
+             th:value="${#temporals.format(paciente.dataNascimento, 'yyyy-MM-dd')}" required>
     </div>
     <div class="mb-3">
       <label class="form-label">Telefone</label>

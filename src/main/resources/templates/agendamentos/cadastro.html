@@ -28,13 +28,24 @@
 
         <div class="mb-3">
             <label class="form-label">Data</label>
-            <input type="date" class="form-control" th:field="*{data}" required>
+            <input type="date" class="form-control"
+                   name="data"
+                   th:value="${#temporals.format(agenda.data, 'yyyy-MM-dd')}" required>
         </div>
 
+        <!-- Campo de Horário com seleção dinâmica -->
         <div class="mb-3">
             <label class="form-label">Horário</label>
-            <input type="time" class="form-control" th:field="*{horario}" required>
+            <select id="horario" class="form-select" th:field="*{horario}" required>
+            <option value="">Selecione um horário...</option>
+                <option th:each="hora : ${horariosDisponiveis}"
+                        th:value="${hora}"
+                        th:text="${hora}"
+                        th:selected="${hora == horarioSelecionado}">
+                </option>
+            </select>
         </div>
+
 
         <button type="submit" class="btn btn-primary">Salvar</button>
         <a class="btn btn-secondary" th:href="@{/agendamentos}">Cancelar</a>
@@ -43,21 +54,54 @@
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 
-<div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
-    <script th:inline="javascript">
-        /<![CDATA[/
-        let mensagem = /[[${msg}]]/ '';
-        let tipo = /[[${tipo}]]/ '';
-        if (mensagem && tipo) {
-          if (tipo === 'sucesso') {
-            alertaSucesso(mensagem);
-          } else {
-            alertaErro(mensagem);
-          }
-        }
-        /]]>/
-    </script>
-</div>
+    <div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
+        <script th:inline="javascript">
+            /<![CDATA[/
+            let mensagem = /[[${msg}]]/ '';
+            let tipo = /[[${tipo}]]/ '';
+            if (mensagem && tipo) {
+              if (tipo === 'sucesso') {
+                alertaSucesso(mensagem);
+              } else {
+                alertaErro(mensagem);
+              }
+            }
+            /]]>/
+        </script>
 
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const medicoSelect = document.querySelector("[name='medico.id']");
+        const dataInput = document.querySelector("[name='data']");
+        const horarioSelect = document.getElementById("horario");
+
+        function buscarHorarios() {
+            const medicoId = medicoSelect.value;
+            const data = dataInput.value;
+
+            if (medicoId && data) {
+                fetch(`/agendamentos/horarios-disponiveis?medicoId=${medicoId}&data=${data}`)
+                    .then(response => response.json())
+                    .then(horarios => {
+                        horarioSelect.innerHTML = "<option value=''>Selecione um horário</option>";
+                        horarios.forEach(h => {
+                            const option = document.createElement("option");
+                            option.value = h;
+                            option.textContent = h;
+                            horarioSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Erro ao buscar horários disponíveis:", error);
+                    });
+            }
+        }
+
+        medicoSelect.addEventListener("change", buscarHorarios);
+        dataInput.addEventListener("change", buscarHorarios);
+    });
+</script>
 </body>
 </html>
