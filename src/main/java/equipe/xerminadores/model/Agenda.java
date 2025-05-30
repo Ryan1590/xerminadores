@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "agendas")
@@ -23,5 +24,6 @@ public class Agenda {
     private Medico medico;
 
     private LocalDate data;
-    private String horario;
+    private LocalTime horario;
+
 }

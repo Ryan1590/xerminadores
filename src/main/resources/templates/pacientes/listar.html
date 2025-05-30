@@ -32,6 +32,9 @@
                 </a>
             </td>
         </tr>
+        <tr th:if="${#lists.isEmpty(pacientes)}">
+            <td colspan="6" class="text-center">Nenhum paciente encontrado.</td>
+        </tr>
         </tbody>
     </table>
 </div>
