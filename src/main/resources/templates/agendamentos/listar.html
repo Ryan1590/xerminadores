@@ -1,10 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header(title='Agendamentos')}"></head>
 <body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Lista de Agendamentos</h2>
+        <a class="btn btn-primary" th:href="@{/agendamentos/novo}">Novo Agendamento</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Paciente</th>
+            <th>Médico</th>
+            <th>Data</th>
+            <th>Horário</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="agenda : ${agendas}">
+            <td th:text="${agenda.id}"></td>
+            <td th:text="${agenda.paciente.nome}"></td>
+            <td th:text="${agenda.medico.nome}"></td>
+            <td th:text="${#temporals.format(agenda.data, 'dd/MM/yyyy')}"></td>
+            <td th:text="${agenda.horario}"></td>
+            <td>
+                <a th:href="@{/agendamentos/editar/{id}(id=${agenda.id})}" class="btn btn-sm btn-warning">Editar</a>
+                <a th:href="@{/agendamentos/excluir/{id}(id=${agenda.id})}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Tem certeza que deseja excluir este agendamento?')">Excluir</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(agendas)}">
+            <td colspan="6" class="text-center">Nenhum agendamento encontrado.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
+    <script th:inline="javascript">
+        /<![CDATA[/
+        let mensagem = /[[${msg}]]/ '';
+        let tipo = /[[${tipo}]]/ '';
+        if (mensagem && tipo) {
+            if (tipo === 'sucesso') {
+                alertaSucesso(mensagem);
+            } else {
+                alertaErro(mensagem);
+            }
+        }
+        /]]>/
+    </script>
+</div>
 
 </body>
 </html>
