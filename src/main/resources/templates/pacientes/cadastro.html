@@ -11,19 +11,19 @@
     <input type="hidden" th:field="*{id}"/>
     <div class="mb-3">
       <label class="form-label">Nome</label>
-      <input type="text" class="form-control" th:field="*{nome}" placeholder="Nome" required>
+      <input type="text" class="form-control" th:field="*{nome}" required>
     </div>
     <div class="mb-3">
       <label class="form-label">CPF</label>
-      <input type="text" class="form-control validar-cpf" th:field="*{cpf}" placeholder="000.000.000-00" required>
+      <input type="text" class="form-control validar-cpf" th:field="*{cpf}" required>
     </div>
     <div class="mb-3">
       <label class="form-label">Data de Nascimento</label>
-      <input type="date" class="form-control"  name="dataNascimento" th:value="${#temporals.format(paciente.dataNascimento, 'yyyy-MM-dd')}" required>
+      <input type="date" class="form-control" th:field="*{dataNascimento}"  required>
     </div>
     <div class="mb-3">
       <label class="form-label">Telefone</label>
-      <input type="text" class="form-control" th:field="*{telefone}" placeholder="99 9 9999-9999" required>
+      <input type="text" class="form-control" th:field="*{telefone}" required>
     </div>
     <button type="submit" class="btn btn-primary">Salvar</button>
     <a class="btn btn-secondary" th:href="@{/pacientes}">Cancelar</a>
@@ -31,22 +31,6 @@
 </div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
-
-<div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
-  <script th:inline="javascript">
-    /*<![CDATA[*/
-    let mensagem = /*[[${msg}]]*/ '';
-    let tipo = /*[[${tipo}]]*/ '';
-    if (mensagem && tipo) {
-      if (tipo === 'sucesso') {
-        alertaSucesso(mensagem);
-      } else {
-        alertaErro(mensagem);
-      }
-    }
-    /*]]>*/
-  </script>
-</div>
 </body>
 </html>
 

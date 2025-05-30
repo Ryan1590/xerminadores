@@ -1,6 +1,5 @@
 package equipe.xerminadores.service;
 
-import equipe.xerminadores.exception.CpfJaCadastradoException;
 import equipe.xerminadores.model.Paciente;
 import equipe.xerminadores.repository.PacienteRepository;
 import org.springframework.stereotype.Service;
@@ -26,15 +25,11 @@ public class PacienteService {
     }
 
     public Paciente salvar(Paciente paciente) {
-        boolean cpfJaExiste = pacienteRepository.findByCpf(paciente.getCpf())
-                .filter(p -> !p.getId().equals(paciente.getId()))
-                .isPresent();
-
-        if (cpfJaExiste) {
-            throw new CpfJaCadastradoException("CPF já cadastrado para outro paciente.");
+        if (paciente.getId() != null) {
+            return atualizar(paciente.getId(), paciente);
+        } else {
+            return pacienteRepository.save(paciente);
         }
-
-        return pacienteRepository.save(paciente);
     }
 
     public Paciente atualizar(Long id, Paciente atualizado) {
@@ -50,5 +45,4 @@ public class PacienteService {
     public void deletar(Long id) {
         pacienteRepository.deleteById(id);
     }
-
 }
