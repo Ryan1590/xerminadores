@@ -16,14 +16,12 @@ public class AgendasRestController {
 
     private final AgendaService agendaService;
 
-    // GET /api/agendas
     @GetMapping
     public ResponseEntity<List<Agenda>> listarTodos() {
         List<Agenda> agendas = agendaService.listarTodos();
         return ResponseEntity.ok(agendas);
     }
 
-    // GET /api/agendas/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Agenda> buscarPorId(@PathVariable Long id) {
         Optional<Agenda> agenda = agendaService.buscarPorId(id);
@@ -31,19 +29,44 @@ public class AgendasRestController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/agendas
     @PostMapping
-    public ResponseEntity<Agenda> criar(@RequestBody Agenda agenda) {
+    public ResponseEntity<?> criar(@RequestBody Agenda agenda) {
+        if (agendaService.horarioNoPassadoOuEmAndamento(agenda.getData(), agenda.getHorario())) {
+            return ResponseEntity.badRequest().body("Horário inválido: não pode agendar no passado ou horário já iniciado.");
+        }
+
+        if (!agendaService.horarioValido(agenda.getHorario())) {
+            return ResponseEntity.badRequest().body("Horário inválido. Use horários entre 08:00 e 18:00 de meia em meia hora.");
+        }
+
+        if (agendaService.existeConflito(agenda)) {
+            return ResponseEntity.badRequest().body("Conflito: já existe um agendamento com o mesmo médico, data e horário.");
+        }
+
         agendaService.salvar(agenda);
         return ResponseEntity.ok(agenda);
     }
 
-    // PUT /api/agendas/{id}
+
+
     @PutMapping("/{id}")
-    public ResponseEntity<Agenda> atualizar(@PathVariable Long id, @RequestBody Agenda novaAgenda) {
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Agenda novaAgenda) {
         Optional<Agenda> agendaExistente = agendaService.buscarPorId(id);
 
         if (agendaExistente.isPresent()) {
+            if (agendaService.horarioNoPassadoOuEmAndamento(novaAgenda.getData(), novaAgenda.getHorario())) {
+                return ResponseEntity.badRequest().body("Horário inválido: não pode agendar no passado ou horário já iniciado.");
+            }
+
+            if (!agendaService.horarioValido(novaAgenda.getHorario())) {
+                return ResponseEntity.badRequest().body("Horário inválido. Use horários entre 08:00 e 18:00 de meia em meia hora.");
+            }
+
+            novaAgenda.setId(id); // necessário para validação de conflito ignorar a si mesma
+            if (agendaService.existeConflito(novaAgenda)) {
+                return ResponseEntity.badRequest().body("Conflito: já existe um agendamento com o mesmo médico, data e horário.");
+            }
+
             Agenda agenda = agendaExistente.get();
             agenda.setData(novaAgenda.getData());
             agenda.setHorario(novaAgenda.getHorario());
@@ -56,7 +79,8 @@ public class AgendasRestController {
         }
     }
 
-    // DELETE /api/agendas/{id}
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         Optional<Agenda> agenda = agendaService.buscarPorId(id);

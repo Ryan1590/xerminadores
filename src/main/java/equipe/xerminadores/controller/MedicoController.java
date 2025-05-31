@@ -76,50 +76,14 @@ public class MedicoController {
             medicoService.deletar(id);
             redirectAttributes.addFlashAttribute("mensagem", "Médico deletado com sucesso!");
             redirectAttributes.addFlashAttribute("tipoMensagem", "sucesso");
+        } catch (IllegalStateException e) {
+            // Exceção lançada caso médico esteja vinculado a algum agendamento
+            redirectAttributes.addFlashAttribute("mensagem", "Não é possível deletar o médico pois ele possui agendamentos vinculados.");
+            redirectAttributes.addFlashAttribute("tipoMensagem", "erro");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensagem", "Erro ao deletar médico: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensagem", "erro");
         }
         return "redirect:/medicos";
-    }
-
-
-    // Endpoints REST (opcional, pode criar api separada se preferir)
-    @GetMapping("/api")
-    @ResponseBody
-    public List<Medico> listarMedicosApi() {
-        return medicoService.listarTodos();
-    }
-
-    @GetMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Medico> buscarMedicoPorIdApi(@PathVariable Long id) {
-        return medicoService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/api")
-    @ResponseBody
-    public Medico salvarMedicoApi(@RequestBody Medico medico) {
-        return medicoService.salvar(medico);
-    }
-
-    @PutMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Medico> atualizarMedicoApi(@PathVariable Long id, @RequestBody Medico medico) {
-        try {
-            Medico medicoAtualizado = medicoService.atualizar(id, medico);
-            return ResponseEntity.ok(medicoAtualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Void> deletarMedicoApi(@PathVariable Long id) {
-        medicoService.deletar(id);
-        return ResponseEntity.noContent().build();
     }
 }

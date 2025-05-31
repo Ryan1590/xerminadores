@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -59,5 +60,40 @@ public class AgendaService {
         return todosHorarios.stream()
                 .filter(h -> !ocupados.contains(h))
                 .collect(Collectors.toList());
+    }
+
+    public boolean existeConflito(Agenda agenda) {
+        List<Agenda> agendasDoMesmoHorario = listarTodos().stream()
+                .filter(a ->
+                        a.getMedico().getId().equals(agenda.getMedico().getId()) &&
+                                a.getData().equals(agenda.getData()) &&
+                                a.getHorario().equals(agenda.getHorario()) &&
+                                !a.getId().equals(agenda.getId()) // evita falso positivo na edição
+                )
+                .toList();
+
+        return !agendasDoMesmoHorario.isEmpty();
+    }
+
+    public boolean horarioValido(LocalTime horario) {
+        LocalTime inicio = LocalTime.of(8, 0);
+        LocalTime fim = LocalTime.of(18, 0);
+
+        if (horario.isBefore(inicio) || horario.isAfter(fim)) {
+            return false;
+        }
+
+        int minuto = horario.getMinute();
+        // valida se é múltiplo de 30 minutos (0 ou 30)
+        return minuto == 0 || minuto == 30;
+    }
+
+    public boolean horarioNoPassadoOuEmAndamento(LocalDate data, LocalTime horario) {
+        LocalDateTime dataHoraAgendada = LocalDateTime.of(data, horario);
+        LocalDateTime agora = LocalDateTime.now();
+
+        // Considera que um agendamento começa exatamente no horário marcado,
+        // então se já passou desse horário, não pode agendar
+        return !dataHoraAgendada.isAfter(agora);
     }
 }

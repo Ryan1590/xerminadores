@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface MedicoRepository extends JpaRepository<Medico, Long> {
     boolean existsByCrm(String crm);
     Optional<Medico> findByCrm(String crm);
+
 }

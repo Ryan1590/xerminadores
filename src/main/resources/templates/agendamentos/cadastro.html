@@ -36,14 +36,14 @@
         <!-- Campo de Horário com seleção dinâmica -->
         <div class="mb-3">
             <label class="form-label">Horário</label>
-            <select id="horario" class="form-select" th:field="*{horario}" required>
-            <option value="">Selecione um horário...</option>
+            <select th:field="*{horario}" class="form-select" required>
+                <option value="">Selecione...</option>
                 <option th:each="hora : ${horariosDisponiveis}"
                         th:value="${hora}"
-                        th:text="${hora}"
-                        th:selected="${hora == horarioSelecionado}">
+                        th:text="${hora}">
                 </option>
             </select>
+
         </div>
 
 
@@ -56,9 +56,10 @@
 
     <div th:if="${mensagem}" th:with="msg=${mensagem}, tipo=${tipoMensagem}">
         <script th:inline="javascript">
-            /<![CDATA[/
-            let mensagem = /[[${msg}]]/ '';
-            let tipo = /[[${tipo}]]/ '';
+            /*<![CDATA[*/
+            let mensagem = /*[[${msg}]]*/ null;
+            let tipo = /*[[${tipo}]]*/ null;
+
             if (mensagem && tipo) {
               if (tipo === 'sucesso') {
                 alertaSucesso(mensagem);
@@ -66,42 +67,41 @@
                 alertaErro(mensagem);
               }
             }
-            /]]>/
+            /*]]>*/
         </script>
-
     </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const medicoSelect = document.querySelector("[name='medico.id']");
-        const dataInput = document.querySelector("[name='data']");
-        const horarioSelect = document.getElementById("horario");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const medicoSelect = document.querySelector("[name='medico.id']");
+            const dataInput = document.querySelector("[name='data']");
+            const horarioSelect = document.getElementById("horario");
 
-        function buscarHorarios() {
-            const medicoId = medicoSelect.value;
-            const data = dataInput.value;
+            function buscarHorarios() {
+                const medicoId = medicoSelect.value;
+                const data = dataInput.value;
 
-            if (medicoId && data) {
-                fetch(`/agendamentos/horarios-disponiveis?medicoId=${medicoId}&data=${data}`)
-                    .then(response => response.json())
-                    .then(horarios => {
-                        horarioSelect.innerHTML = "<option value=''>Selecione um horário</option>";
-                        horarios.forEach(h => {
-                            const option = document.createElement("option");
-                            option.value = h;
-                            option.textContent = h;
-                            horarioSelect.appendChild(option);
+                if (medicoId && data) {
+                    fetch(`/agendamentos/horarios-disponiveis?medicoId=${medicoId}&data=${data}`)
+                        .then(response => response.json())
+                        .then(horarios => {
+                            horarioSelect.innerHTML = "<option value=''>Selecione um horário</option>";
+                            horarios.forEach(h => {
+                                const option = document.createElement("option");
+                                option.value = h;
+                                option.textContent = h;
+                                horarioSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error("Erro ao buscar horários disponíveis:", error);
                         });
-                    })
-                    .catch(error => {
-                        console.error("Erro ao buscar horários disponíveis:", error);
-                    });
+                }
             }
-        }
 
-        medicoSelect.addEventListener("change", buscarHorarios);
-        dataInput.addEventListener("change", buscarHorarios);
-    });
-</script>
+            medicoSelect.addEventListener("change", buscarHorarios);
+            dataInput.addEventListener("change", buscarHorarios);
+        });
+    </script>
 </body>
 </html>

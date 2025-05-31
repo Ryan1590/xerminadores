@@ -8,4 +8,8 @@ import java.util.List;
 
 public interface AgendaRepository extends JpaRepository<Agenda, Long> {
     List<Agenda> findByMedicoIdAndData(Long medicoId, LocalDate data);
+
+    List<Agenda> findByPacienteId(Long pacienteId);
+
+    List<Agenda> findByMedicoId(Long medicoId);
 }

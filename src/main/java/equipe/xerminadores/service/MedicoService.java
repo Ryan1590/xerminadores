@@ -2,6 +2,7 @@ package equipe.xerminadores.service;
 
 import equipe.xerminadores.exception.DuplicateCrmException;
 import equipe.xerminadores.model.Medico;
+import equipe.xerminadores.repository.AgendaRepository;
 import equipe.xerminadores.repository.MedicoRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +13,12 @@ import java.util.Optional;
 public class MedicoService {
 
     private final MedicoRepository medicoRepository;
+    private final AgendaRepository agendaRepository;
 
-    public MedicoService(MedicoRepository medicoRepository) {
+    // Injetando os dois repositórios no construtor
+    public MedicoService(MedicoRepository medicoRepository, AgendaRepository agendaRepository) {
         this.medicoRepository = medicoRepository;
+        this.agendaRepository = agendaRepository;
     }
 
     public List<Medico> listarTodos() {
@@ -26,22 +30,22 @@ public class MedicoService {
     }
 
     public Medico salvar(Medico medico) {
-        // Se for novo registro (id == null)
+        // Novo registro (id == null)
         if (medico.getId() == null) {
             if (medicoRepository.existsByCrm(medico.getCrm())) {
                 throw new DuplicateCrmException("CRM '" + medico.getCrm() + "' já está cadastrado.");
             }
             return medicoRepository.save(medico);
         }
-        // Se for atualização: permitir mesmo CRM se for o mesmo registro,
-        // mas bloquear se outro registro já usar aquele CRM
+
+        // Atualização: permite mesmo CRM se for o mesmo registro, bloqueia se outro usar
         Optional<Medico> existente = medicoRepository.findByCrm(medico.getCrm());
         if (existente.isPresent() && !existente.get().getId().equals(medico.getId())) {
             throw new DuplicateCrmException("CRM '" + medico.getCrm() + "' já está cadastrado.");
         }
+
         return medicoRepository.save(medico);
     }
-
 
     public Medico atualizar(Long id, Medico medicoAtualizado) {
         return medicoRepository.findById(id).map(medico -> {
@@ -53,6 +57,12 @@ public class MedicoService {
     }
 
     public void deletar(Long id) {
+        // Verifica se médico possui agendamentos vinculados
+        boolean existeAgendamento = !agendaRepository.findByMedicoId(id).isEmpty();
+        if (existeAgendamento) {
+            throw new IllegalStateException("Médico possui agendamentos vinculados e não pode ser deletado.");
+        }
         medicoRepository.deleteById(id);
     }
+
 }

@@ -1,6 +1,7 @@
 package equipe.xerminadores.controller;
 
 import equipe.xerminadores.exception.CpfJaCadastradoException;
+import equipe.xerminadores.exception.DataNascimentoInvalidaException;
 import equipe.xerminadores.model.Paciente;
 import equipe.xerminadores.service.PacienteService;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +48,16 @@ public class PacienteController {
             pacienteService.salvar(paciente);
             redirect.addFlashAttribute("mensagem", "Paciente salvo com sucesso!");
             redirect.addFlashAttribute("tipoMensagem", "sucesso");
+        } catch (DataNascimentoInvalidaException e) {
+            redirect.addFlashAttribute("mensagem", e.getMessage());
+            redirect.addFlashAttribute("tipoMensagem", "erro");
+            redirect.addFlashAttribute("paciente", paciente);  // manter os dados do formulário
+            return "redirect:/pacientes/novo";
         } catch (CpfJaCadastradoException e) {
             redirect.addFlashAttribute("mensagem", e.getMessage());
             redirect.addFlashAttribute("tipoMensagem", "erro");
-            redirect.addFlashAttribute("paciente", paciente);  // para manter dados do formulário
-            return "redirect:/pacientes/novo"; // ou direcionar para a página de cadastro
+            redirect.addFlashAttribute("paciente", paciente);
+            return "redirect:/pacientes/novo";
         } catch (Exception e) {
             redirect.addFlashAttribute("mensagem", "Erro ao salvar: " + e.getMessage());
             redirect.addFlashAttribute("tipoMensagem", "erro");
@@ -59,12 +65,17 @@ public class PacienteController {
         return "redirect:/pacientes";
     }
 
+
     @GetMapping("/deletar/{id}")
     public String deletarPaciente(@PathVariable Long id, RedirectAttributes redirect) {
         try {
             pacienteService.deletar(id);
             redirect.addFlashAttribute("mensagem", "Paciente deletado com sucesso!");
             redirect.addFlashAttribute("tipoMensagem", "sucesso");
+        } catch (IllegalStateException e) {
+            // Exceção lançada caso paciente esteja vinculado a algum agendamento
+            redirect.addFlashAttribute("mensagem", "Não é possível deletar o paciente pois ele possui agendamentos vinculados.");
+            redirect.addFlashAttribute("tipoMensagem", "erro");
         } catch (Exception e) {
             redirect.addFlashAttribute("mensagem", "Erro ao deletar: " + e.getMessage());
             redirect.addFlashAttribute("tipoMensagem", "erro");
@@ -72,41 +83,4 @@ public class PacienteController {
         return "redirect:/pacientes";
     }
 
-    // REST (opcional)
-    @GetMapping("/api")
-    @ResponseBody
-    public List<Paciente> listarApi() {
-        return pacienteService.listarTodos();
-    }
-
-    @GetMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Paciente> buscarApi(@PathVariable Long id) {
-        return pacienteService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/api")
-    @ResponseBody
-    public Paciente salvarApi(@RequestBody Paciente paciente) {
-        return pacienteService.salvar(paciente);
-    }
-
-    @PutMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Paciente> atualizarApi(@PathVariable Long id, @RequestBody Paciente paciente) {
-        try {
-            return ResponseEntity.ok(pacienteService.atualizar(id, paciente));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/api/{id}")
-    @ResponseBody
-    public ResponseEntity<Void> deletarApi(@PathVariable Long id) {
-        pacienteService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
 }

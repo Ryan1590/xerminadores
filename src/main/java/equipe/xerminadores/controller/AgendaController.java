@@ -43,21 +43,26 @@ public class AgendaController {
     @PostMapping
     public String salvar(@ModelAttribute("agenda") Agenda agenda, RedirectAttributes redirectAttributes) {
         try {
+            // Verifica se o horário é no passado ou no horário atual
+            if (agendaService.horarioNoPassadoOuEmAndamento(agenda.getData(), agenda.getHorario())) {
+                redirectAttributes.addFlashAttribute("mensagem", "Não é possível agendar para horários passados ou já iniciados.");
+                redirectAttributes.addFlashAttribute("tipoMensagem", "erro");
+                return agenda.getId() == null ? "redirect:/agendamentos/novo" : "redirect:/agendamentos/editar/" + agenda.getId();
+            }
+
+            // Se estiver tudo certo, salva
             agendaService.salvar(agenda);
             redirectAttributes.addFlashAttribute("mensagem", "Agendamento salvo com sucesso!");
             redirectAttributes.addFlashAttribute("tipoMensagem", "sucesso");
             return "redirect:/agendamentos";
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensagem", "Erro ao salvar agendamento: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensagem", "erro");
-            // Redireciona conforme for novo ou edição
-            if (agenda.getId() == null) {
-                return "redirect:/agendamentos/novo";
-            } else {
-                return "redirect:/agendamentos/editar/" + agenda.getId();
-            }
+            return agenda.getId() == null ? "redirect:/agendamentos/novo" : "redirect:/agendamentos/editar/" + agenda.getId();
         }
     }
+
 
     @GetMapping("/horarios-disponiveis") // <- apenas isso
     @ResponseBody
@@ -72,7 +77,6 @@ public class AgendaController {
     public String editar(@PathVariable Long id, Model model) {
         var agenda = agendaService.buscarPorId(id).orElseThrow();
 
-        // Formata o horario para string e passa como atributo separado
         String horarioFormatado = agenda.getHorario() != null
                 ? agenda.getHorario().format(DateTimeFormatter.ofPattern("HH:mm"))
                 : "";
@@ -80,13 +84,22 @@ public class AgendaController {
         model.addAttribute("agenda", agenda);
         model.addAttribute("pacientes", pacienteService.listarTodos());
         model.addAttribute("medicos", medicoService.listarTodos());
-        model.addAttribute("horarioSelecionado", horarioFormatado);
 
+        // Pega os horários disponíveis excluindo os já agendados
         List<String> horariosDisponiveis = agendaService.gerarHorariosDisponiveis(agenda.getData(), agenda.getMedico().getId());
+
+        // Adiciona o horário atual da agenda, se não estiver na lista
+        String horarioAtual = horarioFormatado;
+        if (!horariosDisponiveis.contains(horarioAtual)) {
+            horariosDisponiveis.add(0, horarioAtual); // ou .add(...) se quiser no fim da lista
+        }
+
         model.addAttribute("horariosDisponiveis", horariosDisponiveis);
+        model.addAttribute("horarioSelecionado", horarioAtual);
 
         return "agendamentos/cadastro";
     }
+
 
 
     @GetMapping("/excluir/{id}")
